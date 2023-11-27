@@ -1,38 +1,38 @@
 import sys
-from PyQt5 import uic
+from PyQt5.QtWidgets import QApplication, QMainWindow
+from PyQt5.QtGui import QPainter, QColor
 from random import randint
-from PyQt5.QtGui import QColor, QPainter
-from PyQt5.QtWidgets import QApplication
-from PyQt5.QtWidgets import QMainWindow
+from uifill import Ui_MainWindow
 
 
-class MyWidget(QMainWindow):
+class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
-        uic.loadUi('Ui.ui', self)
-        self.do_paint = False
-        self.pushButton.clicked.connect(self.create)
+        self.setupUi(self)
+        self.button.clicked.connect(self.draw)
+
+    def draw(self):
+        self.update()
 
     def paintEvent(self, event):
-        if self.do_paint:
-            qp = QPainter()
-            qp.begin(self)
-            self.draw(qp)
-            qp.end()
-
-    def draw(self, qp):
-        qp.setBrush(QColor(randint(0, 255), randint(0, 255), randint(0, 255)))
-        r = randint(0, 250)
-        qp.drawEllipse(randint(0, 399 - r), randint(0, 561 - r), r, r)
-        self.do_paint = False
-
-    def create(self):
-        self.do_paint = True
-        self.repaint()
+        qp = QPainter()
+        qp.begin(self)
+        color = QColor(randint(0, 255), randint(0, 255), randint(0, 255))
+        qp.setBrush(color)
+        qp.setPen(color)
+        size = randint(10, 300)
+        x = randint(0, 400)
+        y = randint(0, 250)
+        qp.drawEllipse(x, y, size, size)
+        qp.end()
 
 
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    ex = MyWidget()
-    ex.show()
-    sys.exit(app.exec())
+def except_hook(cls, exception, traceback):
+    sys.__excepthook__(cls, exception, traceback)
+
+
+application = QApplication(sys.argv)
+sys.excepthook = except_hook
+executable = MainWindow()
+executable.show()
+sys.exit(application.exec_())
